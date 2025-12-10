@@ -22,10 +22,10 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'nama_user' => 'required|string|max:255',  // ✅ Fixed
+            'nama_user' => 'required|string|max:255',
             'no_induk' => 'required|string|max:30|unique:users',
-            'no_hp' => 'required|string|max:30',
-            'email' => 'required|email|max:100|unique:users',
+            'no_hp' => 'required|string|max: 30',
+            'email' => 'required|email|max: 100|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -40,7 +40,7 @@ class AuthController extends Controller
         $user = User::with('role')->find($user->user_id);
         Auth::setUser($user);
 
-        return redirect()->route('peminjam.dashboard')->with('success', 'Registrasi berhasil! ');
+        return redirect()->route('peminjam.dashboard')->with('success', 'Registrasi berhasil!');
     }
 
     public function login(Request $request)
@@ -54,17 +54,17 @@ class AuthController extends Controller
             $request->session()->regenerate();
             
             // Eager load role
-            $user = User::with('role')->find(Auth::id());
+            $user = User::with('role')->find(Auth:: id());
             Auth::setUser($user);
             
             // Redirect berdasarkan role
-            $role_id = $user->role_id;
+            $roleName = $user->role->nama_role;
             
-            return match($role_id) {
-                1 => redirect()->route('peminjam.dashboard'),
-                2 => redirect()->route('admin.dashboard'),
-                3 => redirect()->route('wd.dashboard'),
-                4 => redirect()->route('subkoor.dashboard'),
+            return match($roleName) {
+                'peminjam' => redirect()->route('peminjam.dashboard'),
+                'bapendik' => redirect()->route('admin.dashboard'),
+                'wadek2' => redirect()->route('wd.dashboard'),
+                'subkoor' => redirect()->route('subkoor.dashboard'),
                 default => redirect()->route('peminjam.dashboard')
             };
         }
@@ -76,7 +76,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        Auth:: logout();
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

@@ -10,22 +10,27 @@ use Illuminate\Support\Facades\Auth;
 class RoleMiddleware
 {
     /**
-     * Handle an incoming request.
+     * Handle an incoming request. 
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, ...$roles): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
-        // 1. If not login
-        if (!Auth::check()) {
-            return redirect()->route('show.login')->with('error', 'Silakan login terlebih dahulu,');
+        if (! Auth::check()) {
+            return redirect()->route('show.login')->with('error', 'Silakan login terlebih dahulu.');
         }
 
-        $userRole = Auth::user()->role->nama_role;
+        $user = Auth::user();
+        
+        // Eager load role jika belum di-load
+        if (!$user->relationLoaded('role')) {
+            $user->load('role');
+        }
 
-        // 2. Check listed role
-        if (!in_array($userRole, $roles)) {
-            return abort(403, 'Anda tidak memiliki akses ke halaman ini.');
+        $userRole = $user->role->nama_role;
+
+        if ($userRole !== $role) {
+            abort(403, 'Unauthorized action.');
         }
 
         return $next($request);
