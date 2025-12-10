@@ -24,7 +24,7 @@ return new class extends Migration
             $table->date('tanggal_selesai')->nullable();
             $table->string('dokumen_pendukung')->nullable();
             $table->string('status')->default('diajukan');
-            $table->text('notes');
+            $table->text('notes')->nullable();
             $table->timestamps();
             $table->index(['ruang_id','tanggal_peminjaman']);
         });
