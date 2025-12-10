@@ -10,7 +10,7 @@ return Application::configure(basePath: dirname(__DIR__))
             __DIR__.'/../routes/web.php',
             __DIR__.'/../routes/peminjam.php', 
             __DIR__.'/../routes/admin.php',
-            __DIR__.'/../routes/wadek.php',
+            __DIR__.'/../routes/wd.php',
             __DIR__.'/../routes/subkoor.php',
         ],
         commands: __DIR__.'/../routes/console.php',
