@@ -8,7 +8,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Peminjaman extends Model
 {
+    protected $table = 'peminjamans';  // ✅ Tambahkan ini!
+    
     protected $primaryKey = 'peminjaman_id';
+    
     protected $fillable = [
         'user_id',
         'ruang_id',
