@@ -152,4 +152,18 @@ class PeminjamanController extends Controller
             ->route('peminjam.ajuan.step2', $peminjaman_id)
             ->with('success', 'Detail hari ' . $validated['hari'] . ' berhasil disimpan.');
     }
+
+    // Detail peminjaman
+    public function show($peminjaman_id)
+    {
+        $peminjaman = Peminjaman::with(['ruangan.gedung', 'details'])
+            ->findOrFail($peminjaman_id);
+        
+        // Cek ownership
+        if ($peminjaman->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        return view('peminjam.peminjaman.detail', compact('peminjaman'));
+    }
 }

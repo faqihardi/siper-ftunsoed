@@ -102,7 +102,7 @@
                         @endif
                     </td>
                     <td style="padding: 12px 15px;">
-                        <a href="#" style="color: #3498db; text-decoration: none;">Lihat Detail</a>
+                        <a href="{{ route('peminjam.peminjaman.detail', $peminjaman->peminjaman_id) }}" style="color: #3498db; text-decoration: none;">Lihat Detail</a>
                     </td>
                 </tr>
             @empty
