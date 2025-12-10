@@ -37,7 +37,7 @@
                     {{ $gedung->nama_gedung }}
                 </h3>
                 <p style="color: #666; margin: 0 0 15px 0;">{{ $gedung->ruangan->count() }} ruangan tersedia</p>
-                <a href="{{ route('peminjam. ruangan.showGedung', $gedung->gedung_id) }}" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 8px; font-size: 14px; transition: background-color 0.3s;" onmouseover="this.style. backgroundColor='#2980b9'" onmouseout="this.style.backgroundColor='#3498db'">
+                <a href="{{ route('peminjam.ruangan.showGedung', $gedung->gedung_id) }}" style="display: inline-block; padding: 10px 20px; background-color: #3498db; color: white; text-decoration: none; border-radius: 8px; font-size: 14px; transition: background-color 0.3s;" onmouseover="this.style. backgroundColor='#2980b9'" onmouseout="this.style.backgroundColor='#3498db'">
                     Lihat Ruangan
                 </a>
             </div>

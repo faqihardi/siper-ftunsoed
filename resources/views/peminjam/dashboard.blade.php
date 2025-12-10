@@ -8,7 +8,7 @@
                 <i class="fas fa-th-large"></i>
                 <span>Dashboard</span>
             </a></li>
-            <li><a href="{{ route('peminjam.ajuan. create') }}" class="nav-item">
+            <li><a href="{{ route('peminjam.ajuan.create') }}" class="nav-item">
                 <i class="fas fa-plus-circle"></i>
                 <span>Ajukan Peminjaman</span>
             </a></li>
