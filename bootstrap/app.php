@@ -3,24 +3,33 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: [
-            __DIR__.'/../routes/web.php',
-            __DIR__.'/../routes/peminjam.php', 
-            __DIR__.'/../routes/admin.php',
-            __DIR__.'/../routes/wd.php',
-            __DIR__.'/../routes/subkoor.php',
-        ],
+        web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
+        then: function () {
+            // Load route files untuk setiap role
+            Route::middleware('web')
+                ->group(base_path('routes/peminjam.php'));
+            
+            Route::middleware('web')
+                ->group(base_path('routes/admin.php'));
+            
+            Route::middleware('web')
+                ->group(base_path('routes/wd.php'));
+            
+            Route::middleware('web')
+                ->group(base_path('routes/subkoor.php'));
+        }
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
