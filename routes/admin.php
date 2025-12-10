@@ -6,7 +6,7 @@ use App\Http\Controllers\Admin\ApprovalController;
 use App\Http\Controllers\Admin\ArchiveController;
 use App\Http\Controllers\Admin\NotifikasiController;
 
-Route::middleware(['auth', 'role:bapendik'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin_bapendik'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     

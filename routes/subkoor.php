@@ -6,7 +6,7 @@ use App\Http\Controllers\Subkoor\ApprovalController;
 use App\Http\Controllers\Subkoor\ArchiveController;
 use App\Http\Controllers\Subkoor\NotifikasiController;
 
-Route::middleware(['auth', 'role:subkoor'])->prefix('subkoor')->name('subkoor.')->group(function () {
+Route::middleware(['auth', 'role:sub_koor'])->prefix('subkoor')->name('subkoor.')->group(function () {
     // Dashboard - Final Approval
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     

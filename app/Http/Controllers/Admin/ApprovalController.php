@@ -16,7 +16,7 @@ class ApprovalController extends Controller
             ->latest()
             ->get();
         
-        return view('admin.approval. index', compact('peminjamans'));
+        return view('admin.approval.index', compact('peminjamans'));
     }
 
     public function show($id)
@@ -29,52 +29,68 @@ class ApprovalController extends Controller
 
     public function approve($id)
     {
-        $peminjaman = Peminjaman:: findOrFail($id);
-        
-        // Update status berdasarkan jenis peminjaman
-        // Jika kelas pengganti, langsung approved_final
-        // Jika ruangan biasa atau aula, ke status approved_bapendik
-        $peminjaman->update([
-            'status' => 'disetujui bapendik'
-        ]);
-        
-        // Kirim notifikasi ke peminjam
-        Notifikasi::create([
-            'peminjaman_id' => $peminjaman->peminjaman_id,
-            'user_id' => $peminjaman->user_id,
-            'pesan' => 'Peminjaman ruangan ' . $peminjaman->ruangan->nama_ruang . ' telah disetujui oleh Bapendik.',
-            'status_baca' => 'unread'
-        ]);
-        
-        // Jika bukan aula gedung F, kirim notifikasi ke Subkoor
-        if ($peminjaman->ruangan->nama_ruang !== 'Aula Gedung F') {
-            // TODO: Kirim notifikasi ke Subkoor
+        try {
+            $peminjaman = Peminjaman::findOrFail($id);
+            
+            // Update status menjadi disetujui bapendik
+            $peminjaman->update([
+                'status' => 'disetujui bapendik'
+            ]);
+            
+            // Kirim notifikasi ke peminjam
+            Notifikasi::create([
+                'peminjaman_id' => $peminjaman->peminjaman_id,
+                'user_id' => $peminjaman->user_id,
+                'pesan' => 'Peminjaman ruangan ' . $peminjaman->ruangan->nama_ruang . ' telah disetujui oleh Bapendik. Menunggu persetujuan dari Subkoor.',
+                'status_baca' => 'unread'
+            ]);
+            
+            // Kirim notifikasi ke semua Subkoor (role_id = 4)
+            $subkoorUsers = \App\Models\User::where('role_id', 4)->get();
+            foreach ($subkoorUsers as $subkoor) {
+                Notifikasi::create([
+                    'peminjaman_id' => $peminjaman->peminjaman_id,
+                    'user_id' => $subkoor->user_id,
+                    'pesan' => 'Peminjaman ruangan ' . $peminjaman->ruangan->nama_ruang . ' oleh ' . $peminjaman->user->nama_user . ' telah disetujui Bapendik. Mohon review dan setujui.',
+                    'status_baca' => 'unread'
+                ]);
+            }
+            
+            // Selalu return JSON untuk POST request
+            return response()->json(['success' => true, 'message' => 'Peminjaman berhasil disetujui!']);
+            
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
         }
-        
-        return redirect()->back()->with('success', 'Peminjaman berhasil disetujui!');
     }
 
     public function reject(Request $request, $id)
     {
-        $request->validate([
-            'catatan_penolakan' => 'nullable|string|max:500'
-        ]);
-        
-        $peminjaman = Peminjaman::findOrFail($id);
-        
-        $peminjaman->update([
-            'status' => 'ditolak bapendik',
-            'notes' => $request->catatan_penolakan
-        ]);
-        
-        // Kirim notifikasi ke peminjam
-        Notifikasi::create([
-            'peminjaman_id' => $peminjaman->peminjaman_id,
-            'user_id' => $peminjaman->user_id,
-            'pesan' => 'Peminjaman ruangan ' . $peminjaman->ruangan->nama_ruang . ' ditolak oleh Bapendik.  ' . ($request->catatan_penolakan ??  ''),
-            'status_baca' => 'unread'
-        ]);
-        
-        return redirect()->back()->with('success', 'Peminjaman berhasil ditolak!');
+        try {
+            $request->validate([
+                'catatan_penolakan' => 'nullable|string|max:500'
+            ]);
+            
+            $peminjaman = Peminjaman::findOrFail($id);
+            
+            $peminjaman->update([
+                'status' => 'ditolak bapendik',
+                'notes' => $request->catatan_penolakan
+            ]);
+            
+            // Kirim notifikasi ke peminjam
+            Notifikasi::create([
+                'peminjaman_id' => $peminjaman->peminjaman_id,
+                'user_id' => $peminjaman->user_id,
+                'pesan' => 'Peminjaman ruangan ' . $peminjaman->ruangan->nama_ruang . ' ditolak oleh Bapendik. ' . ($request->catatan_penolakan ?? ''),
+                'status_baca' => 'unread'
+            ]);
+            
+            // Selalu return JSON untuk POST request
+            return response()->json(['success' => true, 'message' => 'Peminjaman berhasil ditolak!']);
+            
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: ' . $e->getMessage()], 500);
+        }
     }
 }

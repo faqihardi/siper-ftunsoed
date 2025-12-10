@@ -13,10 +13,10 @@ class DashboardController extends Controller
         // Ambil peminjaman yang perlu approval Bapendik
         // Status: pending atau untuk kelas pengganti
         $peminjamans = Peminjaman::whereIn('status', ['pending', 'diajukan'])
-            ->with(['user', 'ruangan. gedung', 'details'])
+            ->with(['user', 'ruangan.gedung', 'details'])
             ->latest()
             ->get();
         
-        return view('admin. dashboard', compact('peminjamans'));
+        return view('admin.dashboard', compact('peminjamans'));
     }
 }

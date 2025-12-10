@@ -89,91 +89,41 @@
 
     <x-slot name="scripts">
         <script>
-            // Sample data - In production, this comes from Laravel backend
-            let peminjamanData = [
-                {
-                    peminjaman_id: 1,
-                    user_id: 1,
-                    nama: 'Andi Wijaya',
-                    email: 'andi@example.com',
-                    no_hp: '081234567890',
-                    ruang_id: 5,
-                    ruangan: 'C101',
-                    keperluan: 'Workshop',
-                    judul_kegiatan: 'Workshop Web Development',
-                    dokumen_pendukung: 'proposal.pdf',
-                    tanggal_mulai: '05 November 2025',
-                    tanggal_selesai: '06 November 2025',
-                    durasi:  2,
-                    status: 'pending',
-                    notes: null,
-                    created_at: '2025-12-10',
-                    detail_days: [
-                        {
-                            detail_id: 1,
-                            hari: 1,
-                            tanggal_peminjaman: '05 November 2025',
-                            jam_mulai: '08:00',
-                            jam_selesai: '12:00'
-                        },
-                        {
-                            detail_id: 2,
-                            hari:  2,
-                            tanggal_peminjaman: '06 November 2025',
-                            jam_mulai: '13:00',
-                            jam_selesai: '17:00'
-                        }
-                    ]
-                },
-                {
-                    peminjaman_id: 2,
-                    user_id: 2,
-                    nama: 'Budi Santoso',
-                    email: 'budi@example. com',
-                    no_hp: '082345678901',
-                    ruang_id: 1,
-                    ruangan: 'C102',
-                    keperluan: 'Rapat',
-                    judul_kegiatan: 'Rapat Koordinasi Tim',
-                    dokumen_pendukung: 'surat. pdf',
-                    tanggal_mulai: '08 November 2025',
-                    tanggal_selesai: '08 November 2025',
-                    durasi: 1,
-                    status: 'pending',
-                    notes: null,
-                    created_at: '2025-12-09',
-                    detail_days:  [
-                        {
-                            detail_id: 3,
-                            hari: 1,
-                            tanggal_peminjaman: '08 November 2025',
-                            jam_mulai: '09:00',
-                            jam_selesai: '11:00'
-                        }
-                    ]
-                }
-            ];
+            // Data dari backend
+            let peminjamanData = {!! json_encode($peminjamans->map(function($p) {
+                return [
+                    'peminjaman_id' => $p->peminjaman_id,
+                    'user_id' => $p->user_id,
+                    'nama' => $p->user->nama_user,
+                    'email' => $p->user->email,
+                    'no_hp' => $p->user->no_hp,
+                    'ruang_id' => $p->ruang_id,
+                    'ruangan' => $p->ruangan->nama_ruang,
+                    'gedung' => $p->ruangan->gedung->nama_gedung,
+                    'keperluan' => $p->tujuan,
+                    'judul_kegiatan' => $p->detail_kegiatan,
+                    'dokumen_pendukung' => $p->dokumen_pendukung,
+                    'tanggal_mulai' => \Carbon\Carbon::parse($p->tanggal_peminjaman)->format('d M Y'),
+                    'tanggal_selesai' => $p->tanggal_selesai ? \Carbon\Carbon::parse($p->tanggal_selesai)->format('d M Y') : null,
+                    'jam_mulai' => $p->jam_mulai,
+                    'jam_selesai' => $p->jam_selesai,
+                    'durasi' => $p->durasi,
+                    'status' => $p->status,
+                    'notes' => $p->notes,
+                    'created_at' => $p->created_at->format('Y-m-d'),
+                    'detail_days' => $p->details->map(function($d, $index) {
+                        return [
+                            'detail_id' => $d->peminjaman_details_id,
+                            'hari' => $index + 1,
+                            'tanggal_peminjaman' => \Carbon\Carbon::parse($d->tanggal)->format('d M Y'),
+                            'jam_mulai' => $d->jam_mulai,
+                            'jam_selesai' => $d->jam_selesai
+                        ];
+                    })->toArray()
+                ];
+            })->toArray()) !!};
 
-            let arsipData = [
-                {
-                    arsip_id: 1,
-                    nama: 'Siti Rahma',
-                    email: 'siti@example.com',
-                    ruangan: 'Aula',
-                    keperluan: 'Seminar',
-                    tanggal:  '01 November 2025',
-                    status: 'disetujui subkoor'
-                },
-                {
-                    arsip_id: 2,
-                    nama: 'Dedi Kurniawan',
-                    email:  'dedi@example.com',
-                    ruangan: 'Lab Komputer 1',
-                    keperluan: 'Praktikum',
-                    tanggal: '28 Oktober 2025',
-                    status: 'disetujui subkoor'
-                }
-            ];
+            let arsipData = [];
 
             let selectedPeminjaman = null;
 
@@ -193,15 +143,19 @@
                                       'status-rejected';
                     
                     const statusText = item.status === 'pending' ? 'Menunggu' : 
-                                     item.status === 'disetujui bapendik' ?  'Disetujui' : 
+                                     item.status === 'disetujui bapendik' ? 'Disetujui' : 
                                      'Ditolak';
+
+                    // Ambil jam dari detail_days jika ada, atau dari peminjaman utama
+                    const jamMulai = item.detail_days && item.detail_days.length > 0 ? item.detail_days[0].jam_mulai : item.jam_mulai;
+                    const jamSelesai = item.detail_days && item.detail_days.length > 0 ? item.detail_days[0].jam_selesai : item.jam_selesai;
 
                     const row = document.createElement('tr');
                     row.innerHTML = `
                         <td>${index + 1}</td>
                         <td>${item.tanggal_mulai}</td>
                         <td>${item.ruangan}</td>
-                        <td>${item.detail_days[0].jam_mulai} - ${item. detail_days[0].jam_selesai}</td>
+                        <td>${jamMulai} - ${jamSelesai}</td>
                         <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                         <td><button class="btn-detail" onclick="showDetail(${item.peminjaman_id})">Detail</button></td>
                     `;
@@ -289,27 +243,74 @@
             }
 
             function approvePeminjaman(peminjamanId) {
-                if (! confirm('Apakah Anda yakin ingin menyetujui peminjaman ini?')) return;
+                if (!confirm('Apakah Anda yakin ingin menyetujui peminjaman ini?')) return;
 
-                const peminjaman = peminjamanData.find(p => p. peminjaman_id === peminjamanId);
-                if (peminjaman) {
-                    peminjaman. status = 'disetujui bapendik';
-                    loadPeminjamanTable();
-                    document.getElementById('detail-panel').classList.remove('active');
-                    alert('Peminjaman telah disetujui! ');
-                }
+                // Kirim request ke server
+                fetch(`/admin/approval/${peminjamanId}/approve`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert('Peminjaman telah disetujui dan diteruskan ke Subkoor!');
+                        // Reload halaman untuk update data dari server
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Terjadi kesalahan');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menyetujui peminjaman.');
+                });
             }
 
             function rejectPeminjaman(peminjamanId) {
                 if (!confirm('Apakah Anda yakin ingin menolak peminjaman ini?')) return;
 
-                const peminjaman = peminjamanData.find(p => p.peminjaman_id === peminjamanId);
-                if (peminjaman) {
-                    peminjaman.status = 'ditolak bapendik';
-                    loadPeminjamanTable();
-                    document.getElementById('detail-panel').classList.remove('active');
-                    alert('Peminjaman telah ditolak!');
-                }
+                const catatan = prompt('Masukkan alasan penolakan (opsional):');
+                
+                // Kirim request ke server
+                fetch(`/admin/approval/${peminjamanId}/reject`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        catatan_penolakan: catatan
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        alert('Peminjaman telah ditolak!');
+                        // Reload halaman untuk update data dari server
+                        location.reload();
+                    } else {
+                        alert(data.message || 'Terjadi kesalahan');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Terjadi kesalahan saat menolak peminjaman.');
+                });
             }
 
             function downloadDokumen(filename) {

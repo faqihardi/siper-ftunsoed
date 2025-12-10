@@ -20,6 +20,16 @@ class DashboardController extends Controller
             ->latest()
             ->get();
         
-        return view('subkoor.dashboard', compact('peminjamans'));
+        // Ambil arsip (peminjaman yang sudah final approved atau ditolak)
+        $arsips = Peminjaman::whereIn('status', [
+                'disetujui subkoor',
+                'ditolak bapendik',
+                'ditolak subkoor'
+            ])
+            ->with(['user', 'ruangan'])
+            ->latest()
+            ->get();
+        
+        return view('subkoor.dashboard', compact('peminjamans', 'arsips'));
     }
 }

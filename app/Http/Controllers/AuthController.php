@@ -54,7 +54,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
             
             // Eager load role
-            $user = User::with('role')->find(Auth:: id());
+            $user = User::with('role')->find(Auth::id());
             Auth::setUser($user);
             
             // Redirect berdasarkan role
@@ -62,9 +62,9 @@ class AuthController extends Controller
             
             return match($roleName) {
                 'peminjam' => redirect()->route('peminjam.dashboard'),
-                'bapendik' => redirect()->route('admin.dashboard'),
-                'wadek2' => redirect()->route('wd.dashboard'),
-                'subkoor' => redirect()->route('subkoor.dashboard'),
+                'admin_bapendik' => redirect()->route('admin.dashboard'),
+                'wakil_dekan_2' => redirect()->route('wd.dashboard'),
+                'sub_koor' => redirect()->route('subkoor.dashboard'),
                 default => redirect()->route('peminjam.dashboard')
             };
         }

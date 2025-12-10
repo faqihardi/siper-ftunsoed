@@ -6,7 +6,7 @@ use App\Http\Controllers\Wd\ApprovalController;
 use App\Http\Controllers\Wd\ArchiveController;
 use App\Http\Controllers\Wd\NotifikasiController;
 
-Route::middleware(['auth', 'role:wadek2'])->prefix('wd')->name('wd.')->group(function () {
+Route::middleware(['auth', 'role:wakil_dekan_2'])->prefix('wd')->name('wd.')->group(function () {
     // Dashboard - Khusus Aula Gedung F
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
