@@ -6,7 +6,7 @@ use App\Http\Controllers\Peminjam\PeminjamanController;
 use App\Http\Controllers\Peminjam\RuanganController;
 use App\Http\Controllers\Peminjam\NotifikasiController;
 
-Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam')->group(function () {
+Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/ajuan', [PeminjamanController::class, 'create'])->name('ajuan.create');

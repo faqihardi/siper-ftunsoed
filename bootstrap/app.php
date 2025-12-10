@@ -8,10 +8,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: [
             __DIR__.'/../routes/web.php',
-            __DIR__.'/../routes/peminjam.php', 
-            __DIR__.'/../routes/admin.php',
-            __DIR__.'/../routes/wadek.php',
-            __DIR__.'/../routes/subkoor.php',
+            __DIR__.'/../routes/peminjam.php',
         ],
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
@@ -19,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

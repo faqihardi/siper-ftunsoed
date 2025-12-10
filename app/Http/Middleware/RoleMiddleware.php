@@ -21,9 +21,18 @@ class RoleMiddleware
             return redirect()->route('show.login')->with('error', 'Silakan login terlebih dahulu,');
         }
 
-        $userRole = Auth::user()->role->nama_role;
+        // 2. Get user with role relation
+        $user = Auth::user();
+        
+        // 3. Check if role relation exists
+        if (!$user->role) {
+            Auth::logout();
+            return redirect()->route('show.login')->with('error', 'Role pengguna tidak ditemukan. Silakan hubungi administrator.');
+        }
 
-        // 2. Check listed role
+        $userRole = $user->role->nama_role;
+
+        // 4. Check listed role
         if (!in_array($userRole, $roles)) {
             return abort(403, 'Anda tidak memiliki akses ke halaman ini.');
         }
